@@ -11,6 +11,25 @@ app = FastAPI()
 builder = SimpleGraphBuilder()
 
 
+@app.on_event("startup")
+async def seed_demo_graph() -> None:
+    """Seed a simple demo graph at application startup."""
+    # Clear any existing state just in case (fresh builder created on import)
+    # Add demo nodes
+    for n in ["A", "B", "C", "D"]:
+        builder.add_node(n)
+
+    # Add demo edges
+    demo_edges = [
+        ("A", "B"),
+        ("A", "C"),
+        ("B", "D"),
+        ("C", "D"),
+    ]
+    for u, v in demo_edges:
+        builder.add_edge(u, v)
+
+
 class ConnectionManager:
     """Simple in-memory WebSocket connection manager."""
 

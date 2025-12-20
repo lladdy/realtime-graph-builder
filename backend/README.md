@@ -14,14 +14,13 @@ source .venv/bin/activate
 2. Install runtime deps
 
 ```bash
-# install FastAPI and Uvicorn (the [standard] extras provide the `uv` entrypoint/wrappers)
-pip install fastapi "uvicorn[standard]"
+uv sync
 ```
 
 3. Run the app
 
 ```bash
-uv main:app --reload --host 127.0.0.1 --port 8000
+uvicorn main:app --reload --host 127.0.0.1 --port 800
 ```
 
 4. Open http://127.0.0.1:8000/ or http://127.0.0.1:8000/docs for the interactive API docs.
