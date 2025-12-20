@@ -24,7 +24,6 @@ function App() {
 
   return (
     <>
-      {/* container for sigma: fixed full-screen so it fills the viewport */}
       <div
         ref={containerRef}
         id="container"
