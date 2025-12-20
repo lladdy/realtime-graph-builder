@@ -1,33 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useRef, useEffect } from 'react'
 import './App.css'
+import Graph from 'graphology'
+import Sigma from 'sigma'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const graph = new Graph()
+    graph.addNode('1', { label: 'Node 1', x: 0, y: 0, size: 10, color: 'blue' })
+    graph.addNode('2', { label: 'Node 2', x: 1, y: 1, size: 20, color: 'red' })
+    graph.addEdge('1', '2', { size: 5, color: 'purple' })
+
+    let sigmaInstance: any = null
+    if (containerRef.current) {
+      sigmaInstance = new Sigma(graph, containerRef.current)
+    }
+
+    return () => {
+      if (sigmaInstance && typeof sigmaInstance.kill === 'function') sigmaInstance.kill()
+    }
+  }, [])
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* container for sigma: fixed full-screen so it fills the viewport */}
+      <div
+        ref={containerRef}
+        id="container"
+      />
     </>
   )
 }
