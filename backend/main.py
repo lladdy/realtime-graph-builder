@@ -57,8 +57,14 @@ async def grow_graph_worker() -> None:
                 parent = existing_nodes[counter % len(existing_nodes)]
                 builder.add_edge(parent, new_node)
 
-            # Notify all websocket subscribers of the update
-            await manager.broadcast({"event": "graph_update", "graph": builder.get_graph()})
+            # Notify subscribers incrementally: node added, then edge added (if any)
+            await manager.broadcast({"event": "node_added", "node": new_node})
+            if existing_nodes:
+                await manager.broadcast({
+                    "event": "edge_added",
+                    "from": parent,
+                    "to": new_node,
+                })
             counter += 1
     except asyncio.CancelledError:
         # Graceful cancellation on shutdown
@@ -145,16 +151,20 @@ async def get_graph() -> Dict[Any, list]:
 @app.post("/nodes")
 async def add_node(payload: NodeIn):
     builder.add_node(payload.node)
-    # Notify subscribers about the update
-    await manager.broadcast({"event": "graph_update", "graph": builder.get_graph()})
+    # Notify subscribers about the new node only
+    await manager.broadcast({"event": "node_added", "node": payload.node})
     return {"status": "ok", "node": payload.node}
 
 
 @app.post("/edges")
 async def add_edge(payload: EdgeIn):
     builder.add_edge(payload.from_node, payload.to_node)
-    # Notify subscribers about the update
-    await manager.broadcast({"event": "graph_update", "graph": builder.get_graph()})
+    # Notify subscribers about the new edge only
+    await manager.broadcast({
+        "event": "edge_added",
+        "from": payload.from_node,
+        "to": payload.to_node,
+    })
     return {"status": "ok", "from": payload.from_node, "to": payload.to_node}
 
 
@@ -162,8 +172,8 @@ async def add_edge(payload: EdgeIn):
 async def reset_graph():
     global builder
     builder = SimpleGraphBuilder()
-    # Notify subscribers that the graph has been reset
-    await manager.broadcast({"event": "graph_reset", "graph": builder.get_graph()})
+    # Notify subscribers that the graph has been reset (no payload needed)
+    await manager.broadcast({"event": "graph_reset"})
     return {"status": "ok", "message": "graph reset"}
 
 

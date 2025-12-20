@@ -137,16 +137,72 @@ function App() {
       try {
         const data = JSON.parse(evt.data)
         const event: string | undefined = data?.event
-        const graphData: AdjList | undefined = data?.graph
 
-        if (!sigmaInstance || !graphData) return
+        if (!sigmaInstance) return
+
+        const g: Graph = (sigmaInstance as any).graph || graph
 
         switch (event) {
-          case 'graph_init':
-          case 'graph_update':
+          case 'graph_init': {
+            const graphData: AdjList | undefined = data?.graph
+            if (!graphData) return
+            updateGraphInPlace(g, graphData)
+            break
+          }
+          case 'graph_update': {
+            // Backward compatibility: still support full updates if sent
+            const graphData: AdjList | undefined = data?.graph
+            if (!graphData) return
+            updateGraphInPlace(g, graphData)
+            break
+          }
           case 'graph_reset': {
-            // Update the current graph in-place instead of recreating it
-            updateGraphInPlace((sigmaInstance as any).graph || graph, graphData)
+            // Drop all nodes to reset
+            const toDrop: string[] = []
+            g.forEachNode((n) => toDrop.push(String(n)))
+            toDrop.forEach((n) => {
+              if (g.hasNode(n)) g.dropNode(n)
+            })
+            break
+          }
+          case 'node_added': {
+            const node = String(data?.node)
+            if (node && !g.hasNode(node)) {
+              g.addNode(node, {
+                label: node,
+                x: Math.random() * 2 - 1,
+                y: Math.random() * 2 - 1,
+                size: 8,
+                color: '#4f46e5',
+              })
+            }
+            break
+          }
+          case 'edge_added': {
+            const from = String(data?.from)
+            const to = String(data?.to)
+            if (!from || !to) return
+            if (!g.hasNode(from)) {
+              g.addNode(from, {
+                label: from,
+                x: Math.random() * 2 - 1,
+                y: Math.random() * 2 - 1,
+                size: 8,
+                color: '#4f46e5',
+              })
+            }
+            if (!g.hasNode(to)) {
+              g.addNode(to, {
+                label: to,
+                x: Math.random() * 2 - 1,
+                y: Math.random() * 2 - 1,
+                size: 8,
+                color: '#4f46e5',
+              })
+            }
+            if (!g.hasEdge(from, to)) {
+              g.addEdge(from, to, { size: 1, color: '#94a3b8' })
+            }
             break
           }
           default:
