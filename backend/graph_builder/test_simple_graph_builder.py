@@ -1,5 +1,5 @@
 import pytest
-from graph_builder_lib.simple_graph_builder import SimpleGraphBuilder
+from graph_builder.simple_graph_builder import SimpleGraphBuilder
 
 
 def test_add_node():

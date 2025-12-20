@@ -1,9 +1,9 @@
-from graph_builder_lib.graph_builder import GraphBuilder
-import networkx as nx
+from graph_builder.graph_builder import GraphBuilder
 
 
 class NetworkXGraphBuilder(GraphBuilder):
     def __init__(self):
+        import networkx as nx
         self.graph = nx.DiGraph()
 
     def add_node(self, node):

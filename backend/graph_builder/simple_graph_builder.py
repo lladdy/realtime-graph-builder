@@ -1,4 +1,4 @@
-from graph_builder_lib.graph_builder import GraphBuilder
+from graph_builder.graph_builder import GraphBuilder
 
 
 class SimpleGraphBuilder(GraphBuilder):

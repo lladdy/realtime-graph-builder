@@ -2,7 +2,7 @@ import pytest
 
 pytest.importorskip("networkx")
 
-from graph_builder_lib.networkx_graph_builder import NetworkXGraphBuilder
+from graph_builder.networkx_graph_builder import NetworkXGraphBuilder
 
 
 def nx_neighbors_list(g, node):
