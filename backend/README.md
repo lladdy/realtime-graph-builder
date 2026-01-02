@@ -20,7 +20,7 @@ uv sync
 3. Run the app
 
 ```bash
-uvicorn main:app --reload --host 127.0.0.1 --port 800
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 4. Open http://127.0.0.1:8000/ or http://127.0.0.1:8000/docs for the interactive API docs.
